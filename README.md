@@ -3,6 +3,10 @@
 
 **0. Deploy the application**
 
+```shell
+kubectl apply -f ds.yml
+```
+
 
 **1. Install Nginx Ingress Controller**
 
@@ -68,7 +72,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: www.shackverse.co
+  - host: www.test.com   # use your own domain
     http:
       paths:
       - path: /
@@ -80,7 +84,7 @@ spec:
               number: 80
   tls:
   - hosts:
-    - www.shackverse.co
+    - www.test.com   # use your own domain
     secretName: shackverse-co-tls
 ```
 Apply the Ingress: 
