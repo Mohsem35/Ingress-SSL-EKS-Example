@@ -1,4 +1,4 @@
-
+  
 #### SETUP INGRESS & SSL
 
 **0. Deploy the application**
@@ -92,6 +92,8 @@ Apply the Ingress:
 kubectl apply -f ingress.yml
 ```
 >_Note:_ Add the LB url from Ingress created for application in your domain DNS.
+
+<img width="1440" alt="Screenshot 2025-01-12 at 10 21 48 PM" src="https://github.com/user-attachments/assets/a1597a68-7d1c-40fe-b6e6-cc8a2aafd0a9" />
 
 **5. Verify the Setup** To verify the setup:
 
