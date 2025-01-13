@@ -1,0 +1,97 @@
+---
+# MySQL Deployment with Resource Requests
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql  # Name of the Deployment
+spec:
+  selector:
+    matchLabels:
+      app: mysql  # Label selector for pods
+  strategy:
+    type: Recreate  # Deployment strategy
+  template:
+    metadata:
+      labels:
+        app: mysql  # Labels for the pods
+    spec:
+      containers:
+      - image: mysql:8  # MySQL container image
+        name: mysql  # Name of the container
+        env:
+        - name: MYSQL_ROOT_PASSWORD  # Environment variable for MySQL root password
+          value: "Test@123"
+        - name: MYSQL_DATABASE      # Environment variable for MySQL database name
+          value: "bankappdb"
+        ports:
+        - containerPort: 3306       # Port exposed by the container
+          name: mysql
+        resources:
+          requests:
+            memory: "1Gi"  # Memory request for the container
+            cpu: "500m"  # CPU request for the container
+          limits:
+            memory: "2Gi"  # Memory limit for the container
+            cpu: "1000m"  # CPU limit for the container
+---
+# MySQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql  # Name of the Service
+spec:
+  selector:
+    app: mysql  # Label selector for the pods
+  ports:
+  - protocol: TCP
+    port: 3306  # Port exposed by the Service
+    targetPort: 3306  # Port on the container to forward traffic to
+  type: ClusterIP  # Service type
+---
+# Java Application Deployment with Resource Requests
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bankapp  # Name of the Deployment
+spec:
+  replicas: 1  # Number of pod replicas
+  selector:
+    matchLabels:
+      app: bankapp  # Label selector for pods
+  template:
+    metadata:
+      labels:
+        app: bankapp  # Labels for the pods
+    spec:
+      containers:
+      - name: bankapp  # Name of the container
+        image: adijaiswal/bankapp:latest  # Java application container image
+        ports:
+        - containerPort: 8080  # Port exposed by the container
+        env:
+        - name: SPRING_DATASOURCE_URL  # Environment variable for the database URL
+          value: jdbc:mysql://mysql-service:3306/bankappdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+        - name: SPRING_DATASOURCE_USERNAME  # Environment variable for the database username
+          value: root
+        - name: SPRING_DATASOURCE_PASSWORD  # Environment variable for the database password
+          value: Test@123
+        resources:
+          requests:
+            memory: "500Mi"  # Memory request for the container
+            cpu: "500m"  # CPU request for the container
+          limits:
+            memory: "1000Mi"  # Memory limit for the container
+            cpu: "1000m"  # CPU limit for the container
+---
+# Bank Application Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: bankapp-service  # Name of the Service
+spec:
+  type: LoadBalancer  # Service type
+  ports:
+  - port: 80  # Port exposed by the Service
+    targetPort: 8080  # Port on the container to forward traffic to
+  selector:
+    app: bankapp  # Label selector for the pods
